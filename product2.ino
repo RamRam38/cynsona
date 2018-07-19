@@ -14,8 +14,8 @@ WiFiClient client;
 Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY); 
 Adafruit_MQTT_Publish temperature = Adafruit_MQTT_Publish(&mqtt,  AIO_USERNAME "/feeds/welcome-feed"); 
 
-
-
+//DEFINES TIME
+int starttime = 0;
 
 //PORTS
 const int LED = 1;
@@ -29,7 +29,7 @@ const int BUTTON = 2;
 int initX = 0, initY = 0, initZ = 0;
 
 //TOLERANCE LEVEL FOR LOW AMOUNT OF MOVEMENT
-int frame = 200;
+int frame = 10;
 
 /*
  * state = 0 IDLE
@@ -114,19 +114,16 @@ void loop() {
       if (!temperature.publish((char*)b)){
         Serial.println("Sent");
       }
-          //Moves to state 2
+      //Moves to state 2
       state++;
+      starttime = millis();
     }
   }else if(state == 2){
-    //Supposed to read the values from python (but doesn't work right now)
-    if(Serial.available() > 0){
-      char data = Serial.read();
-      char str[2];
-      str[0] = data;
-      str[1] = '\0';
-      if(data == 'N'){
-        analogWrite(BUZZER,0);
-      }
+    if (max(abs(curX - initX),max(abs(curY - initY),abs(curZ - initZ))) < frame && millis() - 3000 > starttime) {
+      digitalWrite(LED, HIGH);
+      analogWrite(BUZZER, 0);
+      blinking = 0;
+      state = 1;
     }
   }
   
