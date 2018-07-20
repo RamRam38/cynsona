@@ -79,7 +79,7 @@ void loop() {
   //Read the value and store it
   val = digitalRead(BUTTON);
   //Detect if there is a transition
-  if ((val == HIGH) && (old_val == LOW)) {
+  if ((val == HIGH) && (old_val == LOW) && state != 2) {
     btnState = 1 - btnState;
   }
 
